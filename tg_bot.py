@@ -1,6 +1,7 @@
 from environs import Env
 import logging
 
+from google.cloud import dialogflow
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
@@ -9,6 +10,19 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+
+def detect_intent_texts(project_id, session_id, text, language_code):
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(project_id, session_id)
+
+    text_input = dialogflow.TextInput(text=text, language_code=language_code)
+    query_input = dialogflow.QueryInput(text=text_input)
+
+    response = session_client.detect_intent(
+        request={"session": session, "query_input": query_input}
+    )
+    return response.query_result.fulfillment_text
 
 
 def start(update: Update, context: CallbackContext) -> None:
@@ -24,7 +38,12 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 
 def echo(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(update.message.text)
+
+    update.message.reply_text(detect_intent_texts(
+                        google_project_id,
+                        update.message.from_user.id,
+                        update.message.text,
+                        'ru'))
 
 
 def main() -> None:
@@ -46,5 +65,6 @@ if __name__ == '__main__':
     env = Env()
     env.read_env()
 
+    google_project_id = env('GOOGLE_PROJECT_ID')
     tg_bot_token = env('TG_BOT_TOKEN')
     main()
