@@ -5,6 +5,7 @@ from google.cloud import dialogflow
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
@@ -46,7 +47,7 @@ def echo(update: Update, context: CallbackContext) -> None:
                         'ru'))
 
 
-def main() -> None:
+def launch_tg_bot() -> None:
     updater = Updater(tg_bot_token)
 
     dispatcher = updater.dispatcher
@@ -67,4 +68,6 @@ if __name__ == '__main__':
 
     google_project_id = env('GOOGLE_PROJECT_ID')
     tg_bot_token = env('TG_BOT_TOKEN')
-    main()
+    vk_token = env('VK_GROUP_TOKEN')
+
+    launch_tg_bot()
