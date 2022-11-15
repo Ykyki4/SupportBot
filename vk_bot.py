@@ -13,11 +13,12 @@ def reply(event, vk_api):
         event.text,
         'ru'
     )
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=answer,
-        random_id=random.randint(1, 1000)
-    )
+    if answer:
+        vk_api.messages.send(
+            user_id=event.user_id,
+            message=answer,
+            random_id=random.randint(1, 1000)
+        )
 
 
 def launch_vk_bot():

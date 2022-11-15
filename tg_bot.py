@@ -25,12 +25,14 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 
 def echo(update: Update, context: CallbackContext) -> None:
-
-    update.message.reply_text(detect_intent_texts(
+    answer = detect_intent_texts(
                         google_project_id,
                         update.message.from_user.id,
                         update.message.text,
-                        'ru'))
+                        'ru')
+
+    if answer:
+        update.message.reply_text(answer)
 
 
 def launch_tg_bot() -> None:
