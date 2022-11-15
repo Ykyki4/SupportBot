@@ -1,9 +1,16 @@
 from environs import Env
+import logging
 import random
+import telegram
+import time
 import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 
 from dialogflow import detect_intent_texts
+from logger import BotLogger
+
+
+logger = logging.getLogger('BotLogger')
 
 
 def reply(event, vk_api):
@@ -26,7 +33,6 @@ def launch_vk_bot():
     vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
-
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW:
             print('Новое сообщение:')
@@ -43,5 +49,18 @@ if __name__ == '__main__':
     env.read_env()
     vk_token = env('VK_GROUP_TOKEN')
     google_project_id = env('GOOGLE_PROJECT_ID')
+    tg_logger_bot_token = env('TG_LOGGER_BOT_TOKEN')
+    admin_tg_chat_id = env('TG_ADMIN_ID')
 
-    launch_vk_bot()
+    bot = telegram.Bot(tg_logger_bot_token)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(BotLogger(bot, admin_tg_chat_id))
+    logger.info('Вк бот запущен')
+
+    try:
+        launch_vk_bot()
+    except ConnectionError:
+        logger.exception('Ошибка подключения вк бота, следующая попытка через 1 минуту.')
+        time.sleep(60)
+    except Exception:
+        logger.exception('Вк бот упал с ошибкой:')
