@@ -3,6 +3,8 @@
 
 Бот поддержки для компании Game of Verbs. Работает на [DialogFlow](https://dialogflow.com/).
 
+![](https://github.com/Ykyki4/SupportBot/blob/main/media/demo_vk_bot.gif)
+
 ## Установка и настройка
 Для начала, скачайте репозиторий в .zip или клонируйте его, изолируйте проект с помощью venv и установите зависимости командой:
 
