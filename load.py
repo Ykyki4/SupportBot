@@ -34,8 +34,9 @@ if __name__ == '__main__':
     env.read_env()
 
     google_project_id = env('GOOGLE_PROJECT_ID')
+    questions_file_path = env('QUESTIONS_FILE_PATH')
 
-    with open("questions.json", "r", encoding='UTF-8') as my_file:
+    with open(questions_file_path, "r", encoding='UTF-8') as my_file:
         questions_raw = my_file.read()
     questions = json.loads(questions_raw)
 
