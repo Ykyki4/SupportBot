@@ -29,19 +29,13 @@ def reply(event, vk_api):
 
 
 def launch_vk_bot():
-
     vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
+    
     for event in longpoll.listen():
-        if event.type == VkEventType.MESSAGE_NEW:
-            print('Новое сообщение:')
-            if event.to_me:
-                reply(event, vk_api)
-                print('Для меня от: ', event.user_id)
-            else:
-                print('От меня для: ', event.user_id)
-            print('Текст:', event.text)
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            reply(event, vk_api)
 
 
 if __name__ == '__main__':
