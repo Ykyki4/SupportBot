@@ -9,10 +9,6 @@ from dialogflow import detect_intent_texts
 from logger import BotLogger
 
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
-
 logger = logging.getLogger('BotLogger')
 
 
@@ -45,6 +41,11 @@ if __name__ == '__main__':
     admin_tg_chat_id = env('TG_ADMIN_ID')
 
     updater = Updater(tg_bot_token)
+
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    )
+    
     logger.setLevel(logging.INFO)
     logger.addHandler(BotLogger(telegram.Bot(tg_logger_bot_token), admin_tg_chat_id))
     logger.info('Телеграмм бот запущен')
