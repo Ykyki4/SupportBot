@@ -1,8 +1,10 @@
+import traceback
+
 from environs import Env
 import logging
 import telegram
 from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ContextTypes
 import time
 
 from dialogflow import detect_intent_texts
@@ -18,6 +20,12 @@ def start(update: Update, context: CallbackContext) -> None:
         fr'Здравствуйте {user.mention_markdown_v2()}\!',
         reply_markup=ForceReply(selective=True),
     )
+
+
+def error_handler(update: object, context: CallbackContext) -> None:
+    logger.error(
+        msg="Произошла ошибка у телеграм бота:",
+        exc_info=context.error)
 
 
 def reply(update: Update, context: CallbackContext) -> None:
@@ -45,20 +53,16 @@ if __name__ == '__main__':
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
     )
-    
+
     logger.setLevel(logging.INFO)
     logger.addHandler(BotLogger(telegram.Bot(tg_logger_bot_token), admin_tg_chat_id))
     logger.info('Телеграмм бот запущен')
 
-    try:
-        dispatcher = updater.dispatcher
-        dispatcher.add_handler(CommandHandler("start", start))
-        dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, reply))
-    except ConnectionError:
-        logger.exception('Ошибка подключения телеграмм бота, следующая попытка через 1 минуту.')
-        time.sleep(60)
-    except Exception:
-        logger.exception('Телеграмм бот упал с ошибкой:')
+    dispatcher = updater.dispatcher
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, reply))
+
+    dispatcher.add_error_handler(error_handler)
 
     updater.start_polling()
     updater.idle()

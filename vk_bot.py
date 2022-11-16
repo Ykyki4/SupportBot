@@ -50,11 +50,8 @@ if __name__ == '__main__':
     logger.setLevel(logging.INFO)
     logger.addHandler(BotLogger(bot, admin_tg_chat_id))
     logger.info('Вк бот запущен')
-
-    try:
-        launch_vk_bot()
-    except ConnectionError:
-        logger.exception('Ошибка подключения вк бота, следующая попытка через 1 минуту.')
-        time.sleep(60)
-    except Exception:
-        logger.exception('Вк бот упал с ошибкой:')
+    while True:
+        try:
+            launch_vk_bot()
+        except Exception:
+            logger.exception('Вк бот упал с ошибкой:')
