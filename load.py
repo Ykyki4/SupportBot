@@ -40,6 +40,5 @@ if __name__ == '__main__':
         questions_raw = my_file.read()
     questions = json.loads(questions_raw)
 
-    for question_key in questions.keys():
-        question = questions[question_key]
-        create_intent(google_project_id, question_key, question['questions'], [question['answer']])
+    for question_item in questions.items():
+        create_intent(google_project_id, question_item[0], question_item[1]['questions'], question_item[1]['answer'])
