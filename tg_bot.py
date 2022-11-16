@@ -1,11 +1,8 @@
-import traceback
-
 from environs import Env
 import logging
 import telegram
 from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ContextTypes
-import time
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 from dialogflow import detect_intent_texts
 from logger import BotLogger
@@ -29,21 +26,19 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 
 def reply(update: Update, context: CallbackContext) -> None:
-    answer = detect_intent_texts(
-                        google_project_id,
+    response = detect_intent_texts(
+                        env('GOOGLE_PROJECT_ID'),
                         update.message.from_user.id,
                         update.message.text,
                         'ru')
 
-    if answer:
-        update.message.reply_text(answer)
+    update.message.reply_text(response.query_result.fulfillment_text)
 
 
 if __name__ == '__main__':
     env = Env()
     env.read_env()
 
-    google_project_id = env('GOOGLE_PROJECT_ID')
     tg_bot_token = env('TG_BOT_TOKEN')
     tg_logger_bot_token = env('TG_LOGGER_BOT_TOKEN')
     admin_tg_chat_id = env('TG_ADMIN_ID')
@@ -56,7 +51,7 @@ if __name__ == '__main__':
 
     logger.setLevel(logging.INFO)
     logger.addHandler(BotLogger(telegram.Bot(tg_logger_bot_token), admin_tg_chat_id))
-    logger.info('Телеграмм бот запущен')
+    logger.info('Телеграм бот запущен')
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("start", start))

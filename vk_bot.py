@@ -14,22 +14,24 @@ logger = logging.getLogger('BotLogger')
 
 
 def reply(event, vk_api):
-    answer = detect_intent_texts(
-        google_project_id,
+    response = detect_intent_texts(
+        env('GOOGLE_PROJECT_ID'),
         event.user_id,
         event.text,
         'ru'
     )
-    if answer:
+    if response.query_result.intent.is_fallback:
+        pass
+    else:
         vk_api.messages.send(
             user_id=event.user_id,
-            message=answer,
+            message=response.query_result.fulfillment_text,
             random_id=random.randint(1, 1000)
         )
 
 
 def launch_vk_bot():
-    vk_session = vk.VkApi(token=vk_token)
+    vk_session = vk.VkApi(token=env('VK_GROUP_TOKEN'))
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
 
@@ -41,8 +43,6 @@ def launch_vk_bot():
 if __name__ == '__main__':
     env = Env()
     env.read_env()
-    vk_token = env('VK_GROUP_TOKEN')
-    google_project_id = env('GOOGLE_PROJECT_ID')
     tg_logger_bot_token = env('TG_LOGGER_BOT_TOKEN')
     admin_tg_chat_id = env('TG_ADMIN_ID')
 
