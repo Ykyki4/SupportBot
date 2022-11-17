@@ -13,9 +13,9 @@ from logger import BotLogger
 logger = logging.getLogger('BotLogger')
 
 
-def reply(event, vk_api):
+def reply(event, vk_api, google_project_id):
     response = detect_intent_texts(
-        env('GOOGLE_PROJECT_ID'),
+        google_project_id,
         event.user_id,
         event.text,
         'ru'
@@ -30,14 +30,14 @@ def reply(event, vk_api):
         )
 
 
-def launch_vk_bot():
-    vk_session = vk.VkApi(token=env('VK_GROUP_TOKEN'))
+def launch_vk_bot(vk_token, google_project_id):
+    vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            reply(event, vk_api)
+            reply(event, vk_api, google_project_id)
 
 
 if __name__ == '__main__':
@@ -45,6 +45,8 @@ if __name__ == '__main__':
     env.read_env()
     tg_logger_bot_token = env('TG_LOGGER_BOT_TOKEN')
     admin_tg_chat_id = env('TG_ADMIN_ID')
+    vk_token = env('VK_GROUP_TOKEN')
+    google_project_id = env('GOOGLE_PROJECT_ID')
 
     bot = telegram.Bot(tg_logger_bot_token)
     logger.setLevel(logging.INFO)
@@ -52,6 +54,6 @@ if __name__ == '__main__':
     logger.info('Вк бот запущен')
     while True:
         try:
-            launch_vk_bot()
+            launch_vk_bot(vk_token, google_project_id)
         except Exception:
             logger.exception('Вк бот упал с ошибкой:')

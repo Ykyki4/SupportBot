@@ -1,4 +1,5 @@
 from environs import Env
+from functools import partial
 import logging
 import telegram
 from telegram import Update, ForceReply
@@ -25,9 +26,9 @@ def error_handler(update: object, context: CallbackContext) -> None:
         exc_info=context.error)
 
 
-def reply(update: Update, context: CallbackContext) -> None:
+def reply(update: Update, context: CallbackContext, google_project_id):
     response = detect_intent_texts(
-                        env('GOOGLE_PROJECT_ID'),
+                        google_project_id,
                         update.message.from_user.id,
                         update.message.text,
                         'ru')
@@ -42,6 +43,7 @@ if __name__ == '__main__':
     tg_bot_token = env('TG_BOT_TOKEN')
     tg_logger_bot_token = env('TG_LOGGER_BOT_TOKEN')
     admin_tg_chat_id = env('TG_ADMIN_ID')
+    google_project_id = env('GOOGLE_PROJECT_ID')
 
     updater = Updater(tg_bot_token)
 
@@ -55,7 +57,9 @@ if __name__ == '__main__':
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, reply))
+    dispatcher.add_handler(MessageHandler(
+                            Filters.text & ~Filters.command,
+                            partial(reply, google_project_id=google_project_id)))
 
     dispatcher.add_error_handler(error_handler)
 
