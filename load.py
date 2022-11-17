@@ -11,7 +11,7 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     training_phrases = []
     for training_phrases_part in training_phrases_parts:
         part = dialogflow.Intent.TrainingPhrase.Part(text=training_phrases_part)
-        # Here we create a new training phrase for each provided part.
+
         training_phrase = dialogflow.Intent.TrainingPhrase(parts=[part])
         training_phrases.append(training_phrase)
 
@@ -40,5 +40,5 @@ if __name__ == '__main__':
         questions_raw = my_file.read()
     questions = json.loads(questions_raw)
 
-    for question_item in questions.items():
-        create_intent(google_project_id, question_item[0], question_item[1]['questions'], question_item[1]['answer'])
+    for question_key, question_value in questions.items():
+        create_intent(google_project_id, question_key, question_value['questions'], question_value['answer'])
